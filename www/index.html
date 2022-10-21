@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Zenacu</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top">
+    <img src="img/brz-logo.svg" class="brz-logo">
+    <a class="navbar-brand" href="index.html">Zenacu</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+<!--    -->
+<!--    <div class="collapse navbar-collapse" id="navbarCollapse">-->
+<!--        <ul class="navbar-nav mr-auto">-->
+<!--            <li class="nav-item active">-->
+<!--                <a class="nav-link" href="index.html">Zenacu</a>-->
+<!--            </li>-->
+<!--            <li class="nav-item ">-->
+<!--                <a class="nav-link" href="results.html" onclick="hideResultDetail();">Test-Ergebnisse</a>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+
+    <!--
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb p-2 mb-0">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item"><a href="javascript:hideResultDetail();">Results</a></li>
+        <li class="breadcrumb-item active"><span class="page-name">xxx</span></li>
+      </ol>
+    </nav>
+    -->
+</nav>
+
+<main role="main" class="container">
+    <div class="jumbotron">
+
+        <h1 id="results">Zeitnachweiscalculator</h1>
+
+        <div class="card mb-3">
+            <h5 class="card-header text-white bg-primary">Step 1</h5>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="sap-text">Pasten Sie hier ihre Zeitkarte aus dem SAP</label>
+                            <textarea name="text" id="sap-text" class="sap-text form-control">
+01 Sa
+02 So
+Wochensumme
+03 Mo Teleworking 08:30 16:30 8,00 6,00 7,50 1,50
+04 Di Gebührenurlaub 6,00 6,00
+05 Mi Teleworking 08:30 10:00 1,50
+Teleworking 10:00 11:30 1,50 6,00 3,00 3,00-
+06 Do 11 12 08:44 14:45 6,01 6,00 6,00
+
+07 Fr 11 12 08:39 11:57 3,30
+11 12 12:37 16:21 3,73 6,00 7,03 1,03
+
+08 Sa
+09 So
+Wochensumme 30,00 29,53 2,53 3,00-
+10 Mo Teleworking 07:30 16:30 9,00 6,00 8,50 2,50
+11 Di 11 11 08:38 12:15 3,62 6,00 3,62 2,38-
+12 Mi Teleworking 08:30 17:15 8,75 6,00 8,25 2,25
+13 Do 11 12 09:03 12:10 3,11 6,00 3,11 2,89-
+14 Fr Teleworking 08:00 16:00 8,00 6,00 7,50 1,50
+15 Sa
+16 So
+Wochensumme 30,00 30,98 6,25 5,27-
+17 Mo 11 12 08:51 16:02 7,19 6,00 6,69 0,69
+18 Di Gebührenurlaub 6,00 6,00
+19 Mi Teleworking 08:30 16:30 8,00 6,00 7,50 1,50
+20 Do 11 12 07:56 14:04 6,13
+Teleworking 15:00 18:00 3,00 6,00 9,00 3,00
+Wochensumme 24,00 29,19 5,19
+                        </textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="freeDays" class="col-2 col-sm-4 col-form-label">Künftige Feiertage</label>
+                    <div class="col-1 col-sm-2">
+                        <input type="number" class="form-control" id="freeDays" name="freeDays" value="1">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="planedHolidays" class="col-2 col-sm-4 col-form-label">Geplanter Urlaub/ZA</label>
+                    <div class="col-1 col-sm-2">
+                        <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="hoursPerWeek" class="col-2 col-sm-4 col-form-label">Anwesenheit/Woche</label>
+                    <div class="col-1 col-sm-2">
+                        <input type="number" class="form-control" id="hoursPerWeek" name="hoursPerWeek" value="30">
+                    </div>
+                    <div class="col-sm-4">
+                        <button class="btn btn-primary" onclick="calc()">Berechnen</button>
+                    </div>
+                </div>
+
+<!--                <label>DEBUG</label>-->
+<!--                <textarea name="text" id="debug" class="sap-text form-control"></textarea>-->
+            </div>
+        </div>
+
+
+
+        <div class="card mb-3">
+            <h5 class="card-header text-white bg-success">Result</h5>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        Soll-Anwesenheit / Monat:
+                    </div>
+                    <div class="col-4 text-right">
+                        <span id="sollAnwesenheit">-</span> h
+                    </div>
+                </div>
+
+                <!-- Urlaube -->
+                <div class="row">
+                    <div class="col-4">
+                        <span class="ml-4">- Urlaube (bisher):</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span id="urlaubeBisherTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-4 text-right text-danger">
+                        - <span id="urlaubeBisherStunden">-</span> h
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <span class=" ml-4">- Urlaube (zukünftig):</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span id="urlaubeKuenftigTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-4 text-right text-danger">
+                        - <span id="urlaubeKuenftigStunden">-</span> h
+                    </div>
+                </div>
+
+                <!-- Feiertage -->
+                <!-- feiertagee -->
+                <div class="row">
+                    <div class="col-4">
+                        <span class="ml-4">- Feiertage (bisher):</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span id="feiertageBisherTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-4 text-right text-danger">
+                        - <span id="feiertageBisherStunden">-</span> h
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <span class=" ml-4">- Feiertage (zukünftig):</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span id="feiertageKuenftigTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-4 text-right text-danger">
+                        - <span id="feiertageKuenftigStunden">-</span> h
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+
+
+        <script src="js/zenacu.js"></script>
+
+
+    </div>
+</main>
+
+<!-- Modal - Progress -->
+<div class="modal fade" id="modalProgress" tabindex="-1" role="dialog" aria-hidden="true"
+     data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title task"></h5>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="desc  mb-4"></div>
+
+                <div class="progress-info">
+                    <div class="progress" style="height: 25px">
+                        <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">
+                            <span class="task-progress"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer text-center">
+                <button class="btn btn-danger cancel">Abbrechen</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

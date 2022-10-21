@@ -1,0 +1,20 @@
+{
+  "name": "zenaca",
+  "version": "1.0.0",
+  "description": "Zeitnachweiscalculator",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "René Huber",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "gulp": "^4.0.2",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-webserver": "^0.9.1"
+  },
+  "scripts": {
+    "start": "npx nodemon src/index.js --ignore results"
+  }
+}
