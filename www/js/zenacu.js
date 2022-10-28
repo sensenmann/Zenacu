@@ -1,6 +1,10 @@
 function calc() {
     clearErrors();
+    saveValuesInCookie();
+
     let sapText = $('#sap-text').val();
+
+    sapText = getEssentialSAPText(sapText);
 
     sapText = sapText.replaceAll('Fortbildung ext', 'Fortbildung_ext')
         .replaceAll('ganztägiger Zei', 'ganztägiger_Zei')
@@ -19,10 +23,13 @@ function calc() {
     let feierTage = calcFeiertage(sapLines);
 
 
+
     sapLines = removeNonsense(sapLines);
     sapLines = fillLines(sapLines);
     sapLines = removeSpecialDays(sapLines);
     let ungebuchteTage = calcUngebuchteTage(sapLines);
+
+
 
     let bookings = convertToBookings(sapLines);
     let timeAnwesend = calcAnwesenheit(bookings);
@@ -71,7 +78,7 @@ function calc() {
     console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
 
 
-    console.debug('# Anwesend SOLL (lt. SAP): ' + round(sollAnwesenheitSAP) + 'h');
+    console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
     console.debug('# Anwesend SOLL: ' + round(sollAnwesenheitThisMonth) + 'h');
     let anwesendDIFF = sollAnwesenheitThisMonth - timeAnwesend;
     console.debug('# Restzeit: ' + round(anwesendDIFF )  + 'h');
@@ -181,6 +188,18 @@ function calc() {
     $('#anwesendDIFF2').text(anwesendDIFF2 > 0 ? round(anwesendDIFF2) : 0);
 
     $('.result').removeClass('hidden');
+}
+
+function saveValuesInCookie() {
+    Cookies.set('zenacu-sap', $('#sap-text').val());
+    Cookies.set('zenacu-hoursperweek', $('#hoursPerWeek').val());
+}
+
+function loadValuesFromCookie() {
+    $('#sap-text').val(Cookies.get('zenacu-sap'));
+    if (Cookies.get('zenacu-hoursperweek')) {
+        $('#hoursPerWeek').val(Cookies.get('zenacu-hoursperweek'));
+    }
 
 }
 
@@ -228,6 +247,17 @@ function calcUngebuchteTage(sapLines) {
         }
     }
     return result;
+}
+
+function getEssentialSAPText(sapLines) {
+    const startText = "Tag Text Beguz Enduz erf. Sollz Rahmz Glz 50% Ü 100% Ü GLZ VP n.g.ÜS Pausch täg.RZ Rufbe";
+    const idx1 = sapLines.indexOf(startText);
+    if (idx1 !== -1) {
+        const idx2 = sapLines.indexOf("S u m m e n ü b e r s i c h t");
+        sapLines = sapLines.substring(idx1 + startText.length + 1, idx2 - 1);
+        $('#sap-text').val(sapLines);
+    }
+    return sapLines;
 }
 
 function removeNonsense(sapLines) {
@@ -316,8 +346,10 @@ function convertToBookings(sapLines) {
             if (sapCols.length == 4) { // Ungebuchte Tage
                 continue;
             } else {
-                console.error("Unknown Line: " + line);
-                showError("Unknown Line: " + line);
+                console.error("Ignoring unknown line: " + line);
+                showError("Ignoring unknown line: " + line + ' <a href="mailto:rene.huber@brz.gv.at?subject='
+                + encodeURI('Zenacu-Feedback: Unknown Line in SAP found') + '&body=' + encodeURI(line) + '">Inform Developer</a>');
+                continue;
             }
         }
 
@@ -440,11 +472,12 @@ function getHollidays() {
 function setFeiertage(feiertage) {
     $('#freeDays').val( feiertage.length);
 
+    let feiertageText = '';
     for (const feiertag of feiertage) {
-        console.log(feiertag);
-        $('#modal-freedays .modal-body').html(
-            $('#modal-freedays .modal-body').html() + '<p>' + feiertag.date + ' - ' + feiertag.name + '</p>'
-        );
+        feiertageText +=  '<p>' + feiertag.date + ' - ' + feiertag.name + '</p>';
+    }
+    if (feiertageText) {
+        $('#modal-freedays .modal-body').html(feiertageText);
     }
 }
 
@@ -453,6 +486,7 @@ function getDaysInMonth(year, month) {
     return new Date(year, month, 0).getDate();
 }
 
+loadValuesFromCookie()
 getHollidays();
 
 
