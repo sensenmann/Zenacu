@@ -10,9 +10,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
     <link href="css/styles.css" rel="stylesheet">
 </head>
 
@@ -25,168 +23,272 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-<!--    -->
-<!--    <div class="collapse navbar-collapse" id="navbarCollapse">-->
-<!--        <ul class="navbar-nav mr-auto">-->
-<!--            <li class="nav-item active">-->
-<!--                <a class="nav-link" href="index.html">Zenacu</a>-->
-<!--            </li>-->
-<!--            <li class="nav-item ">-->
-<!--                <a class="nav-link" href="results.html" onclick="hideResultDetail();">Test-Ergebnisse</a>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--    </div>-->
-
-    <!--
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb p-2 mb-0">
-        <li class="breadcrumb-item"><a href="#">Home</a></li>
-        <li class="breadcrumb-item"><a href="javascript:hideResultDetail();">Results</a></li>
-        <li class="breadcrumb-item active"><span class="page-name">xxx</span></li>
-      </ol>
-    </nav>
-    -->
 </nav>
 
 <main role="main" class="container">
     <div class="jumbotron">
-
         <h1 id="results">Zeitnachweiscalculator</h1>
 
-        <div class="card mb-3">
-            <h5 class="card-header text-white bg-primary">Step 1</h5>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="form-group">
-                            <label for="sap-text">Pasten Sie hier ihre Zeitkarte aus dem SAP</label>
-                            <textarea name="text" id="sap-text" class="sap-text form-control">
-01 Sa
-02 So
-Wochensumme
-03 Mo Teleworking 08:30 16:30 8,00 6,00 7,50 1,50
-04 Di Gebührenurlaub 6,00 6,00
-05 Mi Teleworking 08:30 10:00 1,50
-Teleworking 10:00 11:30 1,50 6,00 3,00 3,00-
-06 Do 11 12 08:44 14:45 6,01 6,00 6,00
+        <div class="row">
+            <div class="col-12 col-xl-6">
+                <div class="card mb-3">
+                <h5 class="card-header text-white bg-primary">Eingabe</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="sap-text">Paste hier deine Zeitkarte aus dem SAP</label>
+                                <i><a href="" data-toggle="modal" data-target="#modal-example-sap">(Beispiel)</a></i>
+                                <textarea name="text" id="sap-text" class="sap-text form-control">
 
-07 Fr 11 12 08:39 11:57 3,30
-11 12 12:37 16:21 3,73 6,00 7,03 1,03
-
-08 Sa
-09 So
-Wochensumme 30,00 29,53 2,53 3,00-
-10 Mo Teleworking 07:30 16:30 9,00 6,00 8,50 2,50
-11 Di 11 11 08:38 12:15 3,62 6,00 3,62 2,38-
-12 Mi Teleworking 08:30 17:15 8,75 6,00 8,25 2,25
-13 Do 11 12 09:03 12:10 3,11 6,00 3,11 2,89-
-14 Fr Teleworking 08:00 16:00 8,00 6,00 7,50 1,50
-15 Sa
-16 So
-Wochensumme 30,00 30,98 6,25 5,27-
-17 Mo 11 12 08:51 16:02 7,19 6,00 6,69 0,69
-18 Di Gebührenurlaub 6,00 6,00
-19 Mi Teleworking 08:30 16:30 8,00 6,00 7,50 1,50
-20 Do 11 12 07:56 14:04 6,13
-Teleworking 15:00 18:00 3,00 6,00 9,00 3,00
-Wochensumme 24,00 29,19 5,19
-                        </textarea>
+                            </textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="freeDays" class="col-2 col-sm-4 col-form-label">Künftige Feiertage</label>
-                    <div class="col-1 col-sm-2">
-                        <input type="number" class="form-control" id="freeDays" name="freeDays" value="1">
+                    <div class="form-group row">
+                        <label for="freeDays" class="col-2 col-sm-6 col-form-label">Künftige Feiertage</label>
+                        <div class="col-1 col-sm-2">
+                            <input type="number" class="form-control" id="freeDays" name="freeDays" value="0">
+                        </div>
+                        <a href="#" data-toggle="modal" data-target="#modal-freedays">(?)</a>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="planedHolidays" class="col-2 col-sm-4 col-form-label">Geplanter Urlaub/ZA</label>
-                    <div class="col-1 col-sm-2">
-                        <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0">
+                    <div class="form-group row">
+                        <label for="planedHolidays" class="col-2 col-sm-6 col-form-label">Geplanter Urlaub/ZA (Tage)</label>
+                        <div class="col-1 col-sm-2">
+                            <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="hoursPerWeek" class="col-2 col-sm-4 col-form-label">Anwesenheit/Woche</label>
-                    <div class="col-1 col-sm-2">
-                        <input type="number" class="form-control" id="hoursPerWeek" name="hoursPerWeek" value="30">
-                    </div>
-                    <div class="col-sm-4">
-                        <button class="btn btn-primary" onclick="calc()">Berechnen</button>
-                    </div>
-                </div>
 
-<!--                <label>DEBUG</label>-->
-<!--                <textarea name="text" id="debug" class="sap-text form-control"></textarea>-->
+                    <div class="form-group row">
+                        <label for="planedHolidays" class="col-2 col-sm-6 col-form-label">Geplante Schulungen (Tage)</label>
+                        <div class="col-1 col-sm-2">
+                            <input type="number" class="form-control" id="planedSchulung" name="planedSchulung" value="0">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="hoursPerWeek" class="col-2 col-sm-6 col-form-label">Soll-Arbeitszeit/Woche (Stunden)</label>
+                        <div class="col-1 col-sm-2 col-md-3">
+                            <input type="number" class="form-control" id="hoursPerWeek" name="hoursPerWeek" value="30">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 col-sm-6">
+                            <input class="" type="checkbox" value="" id="heuteAnwesend">
+                            <label for="heuteAnwesend">Heute eingestempelt</label>
+                        </div>
+                        <div class="col-1 col-sm-3">
+                            <input type="time" class="form-control" id="heuteAnwesendSeit" name="heuteAnwesendSeit" value="07:00" maxlength="5">
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-primary" onclick="calc()">Berechnen</button>
+                        </div>
+                    </div>
+
+
+                    <div class="errors hidden">
+                        <div class="alert alert-danger" role="alert">
+                        </div>
+                    </div>
+
+    <!--                <label>DEBUG</label>-->
+    <!--                <textarea name="text" id="debug" class="sap-text form-control"></textarea>-->
+                </div>
             </div>
-        </div>
+            </div>
 
-
-
-        <div class="card mb-3">
+            <div class="col-12 col-xl-6">
+                <div class="card mb-3 result hidden">
             <h5 class="card-header text-white bg-success">Result</h5>
             <div class="card-body">
                 <div class="row">
                     <div class="col-6">
                         Soll-Anwesenheit / Monat:
                     </div>
-                    <div class="col-4 text-right">
+                    <div class="col-3">
+                        <small><i>40% von <span id="sollArbeitszeit">-</span>h</i></small>
+                    </div>
+
+                    <div class="col-3 text-right">
                         <span id="sollAnwesenheit">-</span> h
                     </div>
                 </div>
 
-                <!-- Urlaube -->
                 <div class="row">
-                    <div class="col-4">
-                        <span class="ml-4">- Urlaube (bisher):</span>
-                    </div>
-                    <div class="col-2 text-right">
-                        <span id="urlaubeBisherTage">-</span> Tag(e)
+                    <div class="col-8">
+                        Ist-Anwesenheit:
                     </div>
                     <div class="col-4 text-right text-danger">
-                        - <span id="urlaubeBisherStunden">-</span> h
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <span class=" ml-4">- Urlaube (zukünftig):</span>
-                    </div>
-                    <div class="col-2 text-right">
-                        <span id="urlaubeKuenftigTage">-</span> Tag(e)
-                    </div>
-                    <div class="col-4 text-right text-danger">
-                        - <span id="urlaubeKuenftigStunden">-</span> h
+                        - <span id="timeAnwesend">-</span> h
                     </div>
                 </div>
 
-                <!-- Feiertage -->
-                <!-- feiertagee -->
-                <div class="row">
-                    <div class="col-4">
-                        <span class="ml-4">- Feiertage (bisher):</span>
+
+                <!-- Krankheit -->
+                <div class="row krankheit">
+                    <div class="col-6">
+                        <span class="ml-4">- Krankheit:</span>
                     </div>
-                    <div class="col-2 text-right">
+                    <div class="col-3 text-right">
+                        <span id="krankheitBisherTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="krankheitBisherStunden">-</span> h
+                    </div>
+                </div>
+
+                <!-- Schulung extern -->
+                <div class="row schulungBisher">
+                    <div class="col-6">
+                        <span class="ml-4">- Schulung extern <small>(bisher)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="schulungBisherTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="schulungBisherStunden">-</span> h
+                    </div>
+                </div>
+
+
+
+                <!-- Feiertage -->
+                <div class="row feiertageBisher">
+                    <div class="col-6">
+                        <span class="ml-4">- Feiertage <small>(bisher)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
                         <span id="feiertageBisherTage">-</span> Tag(e)
                     </div>
-                    <div class="col-4 text-right text-danger">
+                    <div class="col-3 text-right text-danger">
                         - <span id="feiertageBisherStunden">-</span> h
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-4">
-                        <span class=" ml-4">- Feiertage (zukünftig):</span>
+
+
+                <!-- Zeitausgleich -->
+                <div class="row zeitausgleich">
+                    <div class="col-6">
+                        <span class="ml-4">- Zeitausgleich ganzt. <small>(bisher)</small>:</span>
                     </div>
-                    <div class="col-2 text-right">
-                        <span id="feiertageKuenftigTage">-</span> Tag(e)
+                    <div class="col-3 text-right">
+                        <span id="zaBisherTage">-</span> Tag(e)
                     </div>
-                    <div class="col-4 text-right text-danger">
-                        - <span id="feiertageKuenftigStunden">-</span> h
+                    <div class="col-3 text-right text-danger">
+                        - <span id="zaBisherStunden">-</span> h
                     </div>
                 </div>
+
+
+                <!-- Urlaube -->
+                <div class="row urlaubeBisher">
+                    <div class="col-6">
+                        <span class="ml-4">- Urlaube <small>(bisher)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="urlaubeBisherTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="urlaubeBisherStunden">-</span> h
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-12">
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-7">
+                        Soll-Anwesenheit / Monat
+                        <small>(laut SAP)</small>:
+                    </div>
+                    <div class="col-5 text-right">
+                        <span id="sollAnwesenheitSAP">-</span> h
+                    </div>
+                </div>
+
+
+
+                <div class="row schulungGeplant">
+                    <div class="col-6">
+                        <span class="ml-4">- Schulung extern <small>(geplant)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="schulungGeplantTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="schulungGeplantStunden">-</span> h
+                    </div>
+                </div>
+                <div class="row urlaubeGeplant">
+                    <div class="col-6">
+                        <span class=" ml-4">- Urlaube <small>(zukünftig)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="urlaubeGeplantTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="urlaubeGeplantStunden">-</span> h
+                    </div>
+                </div>
+                <div class="row feiertageGeplant">
+                    <div class="col-6">
+                        <span class=" ml-4">- Feiertage <small>(zukünftig)</small>:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="feiertageGeplantTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="feiertageGeplantStunden">-</span> h
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-12">
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        Tatsächlich offene Anwesenheit <small>(exkl. heute)</small>:
+                    </div>
+                    <div class="col-4 text-right">
+                        <span id="anwesendDIFF">-</span> h
+                    </div>
+                </div>
+
+                <div class="row anwesendHeute">
+                    <div class="col-6">
+                        Anwesend heute:
+                    </div>
+                    <div class="col-6 text-right text-danger">
+                        - <span id="timeAnwesendHeute">-</span> h
+                    </div>
+                </div>
+
+                <div class="row dividerAfterAnwesendHeute">
+                    <div class="col-12">
+                        <hr>
+                    </div>
+                </div>
+                <div class="row anwesendSumWithHeute">
+                    <div class="col-8">
+                        Tatsächlich offene Anwesenheit <small>(inkl. heute)</small>:
+                    </div>
+                    <div class="col-4 text-right">
+                        <strong><span id="anwesendDIFF2">-</span> h</strong>
+                    </div>
+                </div>
+
+
                 
             </div>
         </div>
-
+            </div>
+        </div>
 
 
         <script src="js/zenacu.js"></script>
@@ -220,6 +322,32 @@ Wochensumme 24,00 29,19 5,19
             <div class="modal-footer text-center">
                 <button class="btn btn-danger cancel">Abbrechen</button>
 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="modal-example-sap">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img src="img/example.png">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="modal-freedays">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
