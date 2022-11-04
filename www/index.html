@@ -28,9 +28,9 @@
 
 <main role="main" class="container">
     <div class="jumbotron">
-        <h1 id="results">Zeitnachweiscalculator</h1>
+        <h1>Zeitnachweiscalculator</h1>
 
-        <div class="row">
+        <div class="row" id="inputs">
             <div class="col-12 col-xl-6">
                 <div class="card mb-3">
                 <h5 class="card-header text-white bg-primary">Eingabe</h5>
@@ -49,7 +49,7 @@
                         <div class="col-1 col-sm-2">
                             <input type="number" class="form-control" id="freeDays" name="freeDays" value="0">
                         </div>
-                        <a href="#" data-toggle="modal" data-target="#modal-freedays">(?)</a>
+                        <a href="#" data-toggle="modal" data-target="#modal-freedays">&#9432;</a>
                     </div>
                     <div class="form-group row">
                         <label for="planedHolidays" class="col-2 col-sm-6 col-form-label">Geplanter Urlaub/ZA (Tage)</label>
@@ -79,7 +79,7 @@
                             <input type="time" class="form-control" id="heuteAnwesendSeit" name="heuteAnwesendSeit" value="07:00" maxlength="5">
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="calc()">Berechnen</button>
+                    <button class="btn btn-primary" id="btnCalc" onclick="calc()">Berechnen</button>
 
 
 
@@ -107,7 +107,7 @@
                         <small><i>40% von <span id="sollArbeitszeit">-</span>h</i></small>
                     </div>
 
-                    <div class="col-3 text-right">
+                    <div class="col-3 text-right" title="Das ist die Zeit, die du jedes Monat im BRZ anwesend sein musst.">
                         <span id="sollAnwesenheit">-</span> h
                     </div>
                 </div>
@@ -210,15 +210,15 @@
 
 
 
-                <div class="row schulungGeplant">
+                <div class="row feiertageGeplant">
                     <div class="col-6">
-                        <span class="ml-4">- Schulung extern <small>(geplant)</small>:</span>
+                        <span class=" ml-4">- Feiertage <small>(zukünftig)</small>:</span>
                     </div>
                     <div class="col-3 text-right">
-                        <span id="schulungGeplantTage">-</span> Tag(e)
+                        <span id="feiertageGeplantTage">-</span> Tag(e)
                     </div>
                     <div class="col-3 text-right text-danger">
-                        - <span id="schulungGeplantStunden">-</span> h
+                        - <span id="feiertageGeplantStunden">-</span> h
                     </div>
                 </div>
                 <div class="row urlaubeGeplant">
@@ -232,15 +232,15 @@
                         - <span id="urlaubeGeplantStunden">-</span> h
                     </div>
                 </div>
-                <div class="row feiertageGeplant">
+                <div class="row schulungGeplant">
                     <div class="col-6">
-                        <span class=" ml-4">- Feiertage <small>(zukünftig)</small>:</span>
+                        <span class="ml-4">- Schulung extern <small>(geplant)</small>:</span>
                     </div>
                     <div class="col-3 text-right">
-                        <span id="feiertageGeplantTage">-</span> Tag(e)
+                        <span id="schulungGeplantTage">-</span> Tag(e)
                     </div>
                     <div class="col-3 text-right text-danger">
-                        - <span id="feiertageGeplantStunden">-</span> h
+                        - <span id="schulungGeplantStunden">-</span> h
                     </div>
                 </div>
 
