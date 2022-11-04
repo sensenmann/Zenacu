@@ -1,3 +1,5 @@
+const feiertagTexts = ['Maria Hf.', 'Chr.Himm.', 'Nationalft', 'Allerheil.', 'Neujahr'];
+
 function calc() {
     clearErrors();
     saveValuesInCookie();
@@ -9,10 +11,11 @@ function calc() {
     sapText = sapText.replaceAll('Fortbildung ext', 'Fortbildung_ext')
         .replaceAll('ganztägiger Zei', 'ganztägiger_Zei')
         .replaceAll('Erfaßte Zeiten', 'Erfaßte_Zeiten')
-        .replaceAll('Krankheit Covid', 'Krankheit')
-        .replaceAll('Maria Hf.', 'Feiertag')
-        .replaceAll('Chr.Himm.', 'Feiertag')
-        .replace('Nationalft', 'Feiertag');
+        .replaceAll('Krankheit Covid', 'Krankheit');
+
+    for (let feiertagText of feiertagTexts) {
+        sapText = sapText.replaceAll(feiertagText, 'Feiertag');
+    }
 
     let sapLines = sapText.split("\n");
 
@@ -23,28 +26,23 @@ function calc() {
     let feierTage = calcFeiertage(sapLines);
 
 
-
     sapLines = removeNonsense(sapLines);
     sapLines = fillLines(sapLines);
     sapLines = removeSpecialDays(sapLines);
+
     let ungebuchteTage = calcUngebuchteTage(sapLines);
-
-
-
     let bookings = convertToBookings(sapLines);
     let timeAnwesend = calcAnwesenheit(bookings);
 
-    // let workingDays = calcWorkingDays();
     let sollHoursPerWeek = $('#hoursPerWeek').val();
-    // let sollHoursPerDay = sollHoursPerWeek / 5;
     let sollHoursPerMonth = round(166.666666 / 38.5 * sollHoursPerWeek );
-    console.log('# Soll Arbeitszeit / Monat: ' + sollHoursPerMonth + 'h');
+    // console.log('# Soll Arbeitszeit / Monat: ' + sollHoursPerMonth + 'h');
 
     let sollAnwesenheitPerMonth = round((sollHoursPerMonth * 0.4) );
-    console.log('# Soll Anwesenheit / Monat: ' + sollHoursPerMonth + 'h');
+    // console.log('# Soll Anwesenheit / Monat: ' + sollHoursPerMonth + 'h');
 
     let anwesenheitPerDay = round((sollHoursPerWeek / 5) * 0.4);
-    console.log('# Soll Anwesenheit / Tag: ' + anwesenheitPerDay + 'h');
+    // console.log('# Soll Anwesenheit / Tag: ' + anwesenheitPerDay + 'h');
 
 
     let futureFreeDays =  parseInt($('#freeDays').val());
@@ -65,23 +63,18 @@ function calc() {
 
     sollAnwesenheitThisMonth = round(sollAnwesenheitThisMonth);
 
-    console.log('# Soll Anwesenheit (korrigiert): ' + sollAnwesenheitThisMonth + 'h');
-
+    // console.log('# Soll Anwesenheit (korrigiert): ' + sollAnwesenheitThisMonth + 'h');
     // outputDebug(sapLines);
-
     // console.debug('# Arbeitstage: ' + workingDays);
-    console.debug('# Urlaubstage bisher: ' + urlaubsTage);
-    console.debug('# Urlaubstage geplant: ' + planedHolidays);
+    // console.debug('# Urlaubstage bisher: ' + urlaubsTage);
+    // console.debug('# Urlaubstage geplant: ' + planedHolidays);
     // console.debug('# Arbeitstage relevant: ' + finalWorkingDays + 'd');
     // console.debug('# Arbeitszeit relevant: ' + (finalWorkingDays * sollHoursPerDay) + 'h');
-
-    console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
-
-
-    console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
-    console.debug('# Anwesend SOLL: ' + round(sollAnwesenheitThisMonth) + 'h');
+    // console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
+    // console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
+    // console.debug('# Anwesend SOLL: ' + round(sollAnwesenheitThisMonth) + 'h');
     let anwesendDIFF = sollAnwesenheitThisMonth - timeAnwesend;
-    console.debug('# Restzeit: ' + round(anwesendDIFF )  + 'h');
+    // console.debug('# Restzeit: ' + round(anwesendDIFF )  + 'h');
 
 
 
@@ -101,14 +94,14 @@ function calc() {
 
 
 
-    $('#sollArbeitszeit').text(sollHoursPerMonth);
-    $('#sollAnwesenheit').text(sollAnwesenheitPerMonth);
-    $('#sollAnwesenheitSAP').text(round(sollAnwesenheitSAP));
+    $('#sollArbeitszeit').text(formatHour(sollHoursPerMonth));
+    $('#sollAnwesenheit').text(formatHour(sollAnwesenheitPerMonth));
+    $('#sollAnwesenheitSAP').text(formatHour(sollAnwesenheitSAP));
 
     if (urlaubsTage > 0) {
         $('.row.urlaubeBisher').show();
         $('#urlaubeBisherTage').text(urlaubsTage);
-        $('#urlaubeBisherStunden').text(round(urlaubsTage * anwesenheitPerDay));
+        $('#urlaubeBisherStunden').text(formatHour(urlaubsTage * anwesenheitPerDay));
     } else {
         $('.row.urlaubeBisher').hide();
     }
@@ -116,7 +109,7 @@ function calc() {
     if (planedHolidays > 0) {
         $('.row.urlaubeGeplant').show();
         $('#urlaubeGeplantTage').text(planedHolidays);
-        $('#urlaubeGeplantStunden').text(planedHolidays * anwesenheitPerDay);
+        $('#urlaubeGeplantStunden').text(formatHour(planedHolidays * anwesenheitPerDay));
     } else {
         $('.row.urlaubeGeplant').hide();
     }
@@ -124,7 +117,7 @@ function calc() {
     if (feierTage > 0) {
         $('.row.feiertageBisher').show();
         $('#feiertageBisherTage').text(feierTage);
-        $('#feiertageBisherStunden').text(feierTage * anwesenheitPerDay);
+        $('#feiertageBisherStunden').text(formatHour(feierTage * anwesenheitPerDay));
     } else {
         $('.row.feiertageBisher').hide();
     }
@@ -132,7 +125,7 @@ function calc() {
     if (futureFreeDays > 0) {
         $('.row.feiertageGeplant').show();
         $('#feiertageGeplantTage').text(futureFreeDays);
-        $('#feiertageGeplantStunden').text(futureFreeDays * anwesenheitPerDay);
+        $('#feiertageGeplantStunden').text(formatHour(futureFreeDays * anwesenheitPerDay));
     } else {
         $('.row.feiertageGeplant').hide();
     }
@@ -141,21 +134,21 @@ function calc() {
     if (krankheitsTage > 0) {
         $('.row.krankheit').show();
         $('#krankheitBisherTage').text(krankheitsTage);
-        $('#krankheitBisherStunden').text(krankheitsTage * anwesenheitPerDay);
+        $('#krankheitBisherStunden').text(formatHour(krankheitsTage * anwesenheitPerDay));
     } else {
         $('.row.krankheit').hide();
     }
     if (schulungTage > 0) {
         $('.row.schulungBisher').show();
         $('#schulungBisherTage').text(schulungTage);
-        $('#schulungBisherStunden').text(schulungTage * anwesenheitPerDay);
+        $('#schulungBisherStunden').text(formatHour(schulungTage * anwesenheitPerDay));
     } else {
         $('.row.schulungBisher').hide();
     }
     if (planedSchulung > 0) {
         $('.row.schulungGeplant').show();
         $('#schulungGeplantTage').text(planedSchulung);
-        $('#schulungGeplantStunden').text(planedSchulung * anwesenheitPerDay);
+        $('#schulungGeplantStunden').text(formatHour(planedSchulung * anwesenheitPerDay));
     } else {
         $('.row.schulungGeplant').hide();
     }
@@ -163,7 +156,7 @@ function calc() {
     if (zaGanzTage > 0) {
         $('.row.zeitausgleich').show();
         $('#zaBisherTage').text(zaGanzTage);
-        $('#zaBisherStunden').text(zaGanzTage * anwesenheitPerDay);
+        $('#zaBisherStunden').text(formatHour(zaGanzTage * anwesenheitPerDay));
     } else {
         $('.row.zeitausgleich').hide();
     }
@@ -181,11 +174,11 @@ function calc() {
 
 
 
-    $('#sollAnwesenheitKorrigiert').text(sollAnwesenheitThisMonth)
-    $('#timeAnwesend').text(round(timeAnwesend));
-    $('#anwesendDIFF').text(onlyPositive(round(anwesendDIFF)));
-    $('#timeAnwesendHeute').text(round(timeAnwesendHeute));
-    $('#anwesendDIFF2').text(anwesendDIFF2 > 0 ? round(anwesendDIFF2) : 0);
+    $('#sollAnwesenheitKorrigiert').text(formatHour(sollAnwesenheitThisMonth));
+    $('#timeAnwesend').text(formatHour(timeAnwesend));
+    $('#anwesendDIFF').text(formatHour(anwesendDIFF, true));
+    $('#timeAnwesendHeute').text(formatHour(timeAnwesendHeute));
+    $('#anwesendDIFF2').text(anwesendDIFF2 > 0 ? formatHour(anwesendDIFF2)  : 0);
 
     $('.result').removeClass('hidden');
 }
@@ -193,12 +186,26 @@ function calc() {
 function saveValuesInCookie() {
     Cookies.set('zenacu-sap', $('#sap-text').val());
     Cookies.set('zenacu-hoursperweek', $('#hoursPerWeek').val());
+    Cookies.set('heuteAnwesend', $('#heuteAnwesend').is(':checked'));
+    Cookies.set('heuteAnwesendSeit', $('#heuteAnwesendSeit').val());
 }
 
+/**
+ * Lädt die Daten aus den Cookies, falls vorhanden.
+ * 
+ * @param sapLines
+ * @returns {number}
+ */
 function loadValuesFromCookie() {
     $('#sap-text').val(Cookies.get('zenacu-sap'));
     if (Cookies.get('zenacu-hoursperweek')) {
         $('#hoursPerWeek').val(Cookies.get('zenacu-hoursperweek'));
+    }
+    if (Cookies.get('heuteAnwesendSeit')) {
+        $('#heuteAnwesendSeit').val(Cookies.get('heuteAnwesendSeit'));
+    }
+    if (Cookies.get('heuteAnwesend')) {
+        $('#heuteAnwesend').attr('checked', Cookies.get('heuteAnwesend') == 'true');
     }
 
 }
@@ -224,6 +231,14 @@ function calcFeiertage(sapLines) {
     return calcSpecialDays(sapLines, 'Feiertag');
 }
 
+/**
+ * Generische Methode
+ * Zählt die Anzahl der Tage, an denen in Spalte 3 gesuchte prefix vorkommt
+ * z.B. "26 Mo Krankheit"
+ *
+ * @param sapLines
+ * @returns {number}
+ */
 function calcSpecialDays(sapLines, prefix) {
     let result = 0;
     for (const line of sapLines) {
@@ -236,12 +251,18 @@ function calcSpecialDays(sapLines, prefix) {
     return result;
 }
 
+/**
+ * Zählt die Anzahl der Tage, an denen vergessen wurde zu buchen
+ *
+ * @param sapLines
+ * @returns {number}
+ */
 function calcUngebuchteTage(sapLines) {
     let result = 0;
     for (const line of sapLines) {
         const sapCols = line.split(" ");
         if (sapCols.length == 4) {
-            console.debug("Ungebuchte Tage found: " + line);
+            // console.debug("Ungebuchte Tage found: " + line);
             showError("Stunden nicht gebucht am: " + sapCols[1] + ", den " + sapCols[0] + ".");
             result++;
         }
@@ -249,6 +270,14 @@ function calcUngebuchteTage(sapLines) {
     return result;
 }
 
+
+/**
+ * Liefert nur der für uns relevanten SAP-Buchungstext.
+ * Alles davor und danach wird abgeschnitten und verworfen.
+ *
+ * @param sapLines
+ * @returns {string}
+ */
 function getEssentialSAPText(sapLines) {
     const startText = "Tag Text Beguz Enduz erf. Sollz Rahmz Glz 50% Ü 100% Ü GLZ VP n.g.ÜS Pausch täg.RZ Rufbe";
     const idx1 = sapLines.indexOf(startText);
@@ -260,6 +289,13 @@ function getEssentialSAPText(sapLines) {
     return sapLines;
 }
 
+/**
+ * Entfernt Zeilen, die nicht benötigt werden, wie z.B. "Wochensumme",
+ * oder Wochenenden (Sa + So), sofern es keine Buchungen am WE gab.
+ *
+ * @param sapLines
+ * @returns {*[]}
+ */
 function removeNonsense(sapLines) {
     let result = [];
     for (let line of sapLines) {
@@ -270,8 +306,7 @@ function removeNonsense(sapLines) {
             // console.debug("Wochensumme found: " + line);
             continue;
         }
-        // if (['Sa', 'So'].includes(sapCols[1])) {
-        if (sapCols.length == 2) {
+        if (sapCols.length == 2) {      // zB. "03 Sa"
             // console.debug("Weekend found: " + line);
             continue;
         }
@@ -280,13 +315,21 @@ function removeNonsense(sapLines) {
     return result;
 }
 
-
+/**
+ * Entfernt alle speziellen Tage, wie Krankheit, Arztbesuch, Fortbildung, etc.,
+ * sodass nur noch echte Zeitbuchungen übrig bleiben.
+ *
+ * Diese Funktion wird aufgerufen, NACHDEM die Krankheits-Tage, Artz-Tage, etc. gezählt wurden.
+ *
+ * @param sapLines
+ * @returns {*[]}
+ */
 function removeSpecialDays(sapLines) {
     let result = [];
     for (let line of sapLines) {
         line = line.trim();
         const sapCols = line.split(' ');
-        if (['Gebührenurlaub', 'Krankheit', 'Fortbildung_ext', 'ganztägiger_Zei', 'Erfaßte_Zeiten'].includes(sapCols[2])) {
+        if (['Gebührenurlaub', 'Krankheit', 'Arztbesuch', 'Fortbildung_ext', 'ganztägiger_Zei', 'Erfaßte_Zeiten'].includes(sapCols[2])) {
             console.debug("Spezialtag found: " + line);
             continue;
         }
@@ -360,7 +403,7 @@ function convertToBookings(sapLines) {
         if (time > 6 && time < 6.5) time = 6;
         if (time > 6.5) time -= 0.5;
 
-        console.log("Full line found: " + line);
+        // console.log("Full line found: " + line);
         let booking = bookings[day] ;
         if (booking) {
             booking = bookings[day];
@@ -375,7 +418,7 @@ function convertToBookings(sapLines) {
 
         // }
     }
-    console.log(bookings);
+    // console.log(bookings);
     return bookings;
 }
 
@@ -424,6 +467,11 @@ function round(val) {
 
 function onlyPositive(val) {
     return val > 0 ? val : 0;
+}
+
+function formatHour(val, onlyPos = false) {
+    // return round( onlyPos ? onlyPositive(val) : val).toLocaleString('de-DE');
+    return round( onlyPos ? onlyPositive(val) : val).toFixed(2).toString().replaceAll('.', ',');
 }
 
 function getHollidays() {

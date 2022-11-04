@@ -75,13 +75,13 @@
                             <input class="" type="checkbox" value="" id="heuteAnwesend">
                             <label for="heuteAnwesend">Heute eingestempelt</label>
                         </div>
-                        <div class="col-1 col-sm-3">
+                        <div class="col-1 col-sm-4">
                             <input type="time" class="form-control" id="heuteAnwesendSeit" name="heuteAnwesendSeit" value="07:00" maxlength="5">
                         </div>
-                        <div class="col-sm-2">
-                            <button class="btn btn-primary" onclick="calc()">Berechnen</button>
-                        </div>
                     </div>
+                    <button class="btn btn-primary" onclick="calc()">Berechnen</button>
+
+
 
 
                     <div class="errors hidden">
@@ -283,7 +283,7 @@
                 </div>
 
 
-                
+
             </div>
         </div>
             </div>
@@ -343,7 +343,9 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
-                Keine Feiertage in diesem Monat gefunden.
+                Keine künftigen Feiertage in diesem Monat via API gefunden:
+                <br>
+                https://date.nager.at/PublicHoliday/Country/AT
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
