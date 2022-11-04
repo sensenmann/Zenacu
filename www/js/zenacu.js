@@ -194,8 +194,8 @@ function saveValuesInCookie() {
     Cookies.set('zenacu-hoursperweek', $('#hoursPerWeek').val());
     Cookies.set('heuteAnwesend', $('#heuteAnwesend').is(':checked'));
     Cookies.set('heuteAnwesendSeit', $('#heuteAnwesendSeit').val());
-    Cookies.set('planedHolidays', $('#planedHolidays').val());
-    Cookies.set('planedSchulung', $('#planedSchulung').val());
+    Cookies.set('planedHolidaysDates', $('#planedHolidaysDates').val());
+    Cookies.set('planedSchulungDates', $('#planedSchulungDates').val());
 }
 
 /**
@@ -215,11 +215,24 @@ function loadValuesFromCookie() {
     if (Cookies.get('heuteAnwesend')) {
         $('#heuteAnwesend').attr('checked', Cookies.get('heuteAnwesend') == 'true');
     }
-    if (Cookies.get('planedHolidays')) {
-        $('#planedHolidays').val(Cookies.get('planedHolidays'));
+    if (Cookies.get('planedHolidaysDates')) {
+        var dates = Cookies.get('planedHolidaysDates').split(', ');
+        for (let date of dates) {
+            var oDate = new Date(date.split('-')[0], date.split('-')[1]-1, date.split('-')[2]);
+            if(oDate.getTime() < new Date().getTime()) continue;
+            $('#planedHolidaysDatepicker').multiDatesPicker('addDates', [oDate]);
+        }
+        $('#planedHolidays').val( $('#planedHolidaysDatepicker').multiDatesPicker('getDates').length );
     }
-    if (Cookies.get('planedSchulung')) {
-        $('#planedSchulung').val(Cookies.get('planedSchulung'));
+
+    if (Cookies.get('planedSchulungDates')) {
+        var dates = Cookies.get('planedSchulungDates').split(', ');
+        for (let date of dates) {
+            var oDate = new Date(date.split('-')[0], date.split('-')[1]-1, date.split('-')[2]);
+            if(oDate.getTime() < new Date().getTime()) continue;
+            $('#planedSchulungDatepicker').multiDatesPicker('addDates', [oDate]);
+        }
+        $('#planedSchulung').val( $('#planedSchulungDatepicker').multiDatesPicker('getDates').length );
     }
 }
 
@@ -469,7 +482,6 @@ function calcAnwesenheit(bookings) {
     return anwesend;
 }
 
-
 function clearErrors() {
     $('.errors').addClass('hidden');
     $('.errors .alert').html('');
@@ -561,7 +573,6 @@ function setFeiertage(feiertage) {
     }
 }
 
-
 function getDaysInMonth(year, month) {
     return new Date(year, month, 0).getDate();
 }
@@ -574,8 +585,41 @@ function watchInputs() {
     });
 }
 
+
+$('#planedHolidaysDatepicker').multiDatesPicker({
+    altField: '#planedHolidaysDates',
+    firstDay: 1,
+    dateFormat: "yy-m-d",
+    minDate: 0,     // today
+    maxDate: (getDaysInMonth(new Date().getFullYear(), new Date().getMonth()+1) - new Date().getDay() + 1),
+    onSelect: function(dateText) {
+        var dates = $('#planedHolidaysDatepicker').multiDatesPicker('getDates');
+        $('#planedHolidays').val( dates.length );
+        calc();
+    }
+});
+
+$('#planedSchulungDatepicker').multiDatesPicker({
+    altField: '#planedSchulungDates',
+    firstDay: 1,
+    dateFormat: "yy-m-d",
+    minDate: 0,     // today
+    maxDate: (getDaysInMonth(new Date().getFullYear(), new Date().getMonth()+1) - new Date().getDay() + 1),
+    onSelect: function(dateText) {
+        var dates = $('#planedSchulungDatepicker').multiDatesPicker('getDates');
+        $('#planedSchulung').val( dates.length );
+        calc();
+    }
+});
+
+
 loadValuesFromCookie()
 getHollidays();
 watchInputs();
 
 calc();
+
+
+
+
+

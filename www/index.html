@@ -9,10 +9,17 @@
     <title>Zenacu</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script src="js/jquery-3.6.1.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/datepicker-de-AT.js"></script>
+    <script src="js/jquery-ui.multidatespicker.js"></script>
     <script src="js/js.cookie.min.js"></script>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.multidatespicker.css" rel="stylesheet">
 </head>
 
 <body>
@@ -49,25 +56,37 @@
                         <div class="col-1 col-sm-2">
                             <input type="number" class="form-control" id="freeDays" name="freeDays" value="0">
                         </div>
-                        <a href="#" data-toggle="modal" data-target="#modal-freedays">&#9432;</a>
+                        <div class="col-1 col-sm-2">
+                            <a href="#" data-toggle="modal" data-target="#modal-freedays">&#9432;</a>
+                        </div>
                     </div>
                     <div class="form-group row">
                         <label for="planedHolidays" class="col-2 col-sm-6 col-form-label">Geplanter Urlaub/ZA (Tage)</label>
                         <div class="col-1 col-sm-2">
-                            <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0">
+                            <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0" disabled>
+                        </div>
+                        <div class="col-1 col-sm-4">
+                            <a href="#" onclick="$('#planedHolidaysDatepicker').toggle();">&#9432;</a>
+                            <input type="hidden" id="planedHolidaysDates" name="planedHolidaysDates">
+                            <div id="planedHolidaysDatepicker" style="display: none; position: absolute; z-index: 2; background: #fff"></div>
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label for="planedHolidays" class="col-2 col-sm-6 col-form-label">Geplante Schulungen (Tage)</label>
+                        <label for="planedSchulung" class="col-2 col-sm-6 col-form-label">Geplante Schulungen (Tage)</label>
                         <div class="col-1 col-sm-2">
-                            <input type="number" class="form-control" id="planedSchulung" name="planedSchulung" value="0">
+                            <input type="number" class="form-control" id="planedSchulung" name="planedSchulung" value="0" disabled>
+                        </div>
+                        <div class="col-1 col-sm-4">
+                            <a href="#" onclick="$('#planedSchulungDatepicker').toggle();">&#9432;</a>
+                            <input type="hidden" id="planedSchulungDates" name="planedSchulungDates">
+                            <div id="planedSchulungDatepicker" style="display: none; position: absolute; z-index: 2; background: #fff"></div>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="hoursPerWeek" class="col-2 col-sm-6 col-form-label">Soll-Arbeitszeit/Woche (Stunden)</label>
                         <div class="col-1 col-sm-2 col-md-3">
-                            <input type="number" class="form-control" id="hoursPerWeek" name="hoursPerWeek" value="38.5">
+                            <input type="number" class="form-control" id="hoursPerWeek" name="hoursPerWeek" value="38.5" step="0.5">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -290,8 +309,6 @@
         </div>
 
 
-        <script src="js/zenacu.js"></script>
-
 
     </div>
 </main>
@@ -360,5 +377,6 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="js/zenacu.js"></script>
 </body>
 </html>
