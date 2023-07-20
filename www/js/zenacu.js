@@ -38,6 +38,9 @@ function calc() {
     let sollHoursPerMonth = round(166.666666 / 38.5 * sollHoursPerWeek );
     // console.log('# Soll Arbeitszeit / Monat: ' + sollHoursPerMonth + 'h');
 
+    let workingHoursPerDay = sollHoursPerWeek / 5;
+    // 7,7h / Tag bei 38,5h
+
     let sollAnwesenheitPerMonth = round((sollHoursPerMonth * 0.4) );
     // console.log('# Soll Anwesenheit / Monat: ' + sollHoursPerMonth + 'h');
 
@@ -53,16 +56,13 @@ function calc() {
     let sollAnwesenheitThisMonth = sollAnwesenheitPerMonth -
         ((krankheitsTage + futureFreeDays +
             urlaubsTage + planedHolidays +
-            planedSchulung +
             zaGanzTage +
             feierTage) * anwesenheitPerDay
-            + (schulungHours * 0.4)
+            + (planedSchulung * workingHoursPerDay)
+            + schulungHours
         );
 
-    let sollAnwesenheitSAP = sollAnwesenheitPerMonth -
-        ((krankheitsTage + urlaubsTage + zaGanzTage +feierTage) * anwesenheitPerDay +
-            (schulungHours * 0.4))
-        - timeAnwesend;
+    let sollAnwesenheitSAP = sollAnwesenheitPerMonth - sollAnwesenheitThisMonth - timeAnwesend;
 
     sollAnwesenheitThisMonth = round(sollAnwesenheitThisMonth);
 
@@ -143,15 +143,15 @@ function calc() {
     }
     if (schulungHours > 0) {
         $('.row.schulungBisher').show();
-        $('#schulungBisherTage').text(schulungHours / anwesenheitPerDay);
-        $('#schulungBisherStunden').text(formatHour(schulungHours * 0.4));
+        $('#schulungBisherTage').text(schulungHours / workingHoursPerDay);
+        $('#schulungBisherStunden').text(formatHour(schulungHours));
     } else {
         $('.row.schulungBisher').hide();
     }
     if (planedSchulung > 0) {
         $('.row.schulungGeplant').show();
         $('#schulungGeplantTage').text(planedSchulung);
-        $('#schulungGeplantStunden').text(formatHour(planedSchulung * anwesenheitPerDay));
+        $('#schulungGeplantStunden').text(formatHour(planedSchulung * workingHoursPerDay));
     } else {
         $('.row.schulungGeplant').hide();
     }
