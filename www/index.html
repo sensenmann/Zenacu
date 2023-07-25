@@ -66,7 +66,7 @@
                             <input type="number" class="form-control" id="planedHolidays" name="planedHolidays" value="0" disabled>
                         </div>
                         <div class="col-1 col-sm-4">
-                            <a href="#" onclick="$('#planedHolidaysDatepicker').toggle();">&#9432;</a>
+                            <a href="#" onclick="$('#planedHolidaysDatepicker').toggle();">Edit</a>
                             <input type="hidden" id="planedHolidaysDates" name="planedHolidaysDates">
                             <div id="planedHolidaysDatepicker" style="display: none; position: absolute; z-index: 2; background: #fff"></div>
                         </div>
@@ -78,7 +78,7 @@
                             <input type="number" class="form-control" id="planedSchulung" name="planedSchulung" value="0" disabled>
                         </div>
                         <div class="col-1 col-sm-4">
-                            <a href="#" onclick="$('#planedSchulungDatepicker').toggle();">&#9432;</a>
+                            <a href="#" onclick="$('#planedSchulungDatepicker').toggle();">Edit</a>
                             <input type="hidden" id="planedSchulungDates" name="planedSchulungDates">
                             <div id="planedSchulungDatepicker" style="display: none; position: absolute; z-index: 2; background: #fff"></div>
                         </div>
@@ -107,9 +107,6 @@
                         <div class="alert alert-danger" role="alert">
                         </div>
                     </div>
-
-    <!--                <label>DEBUG</label>-->
-    <!--                <textarea name="text" id="debug" class="sap-text form-control"></textarea>-->
                 </div>
             </div>
             </div>
@@ -207,6 +204,19 @@
                     </div>
                     <div class="col-3 text-right text-danger">
                         - <span id="urlaubeBisherStunden">-</span> h
+                    </div>
+                </div>
+
+                <!-- Sonstiges (Betriebsausflug, etc) -->
+                <div class="row sonstiges">
+                    <div class="col-6">
+                        <span class="ml-4">- Sonstiges:</span>
+                    </div>
+                    <div class="col-3 text-right">
+                        <span id="sonstigesTage">-</span> Tag(e)
+                    </div>
+                    <div class="col-3 text-right text-danger">
+                        - <span id="sonstigesStunden">-</span> h
                     </div>
                 </div>
 

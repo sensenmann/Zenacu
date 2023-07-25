@@ -6,8 +6,11 @@
     display: none;
 }
 
+.container {
 
-@media (min-width: 1600px) {
+}
+
+@media (min-width: 1350px) {
     .container, .container-lg, .container-md, .container-sm, .container-xl {
         max-width: 1345px;
     }

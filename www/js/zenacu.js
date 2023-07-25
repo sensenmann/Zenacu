@@ -1,8 +1,16 @@
-const feiertagTexts = ['Maria Hf.', 'Chr.Himm.', 'Nationalft', 'Allerheil.', 'Neujahr', 'Maria Empf', 'Hl.Abend', 'Christtag', 'Stefanitag'];
+const feiertagTexts = ['Maria Hf.', 'Chr.Himm.', 'Nationalft', 'Allerheil.', 'Neujahr', 'Maria Empf', 'Hl.Abend', 'Christtag', 'Stefanitag', 'Staatsft.', 'Pfingstmo.', 'Fronleichn'];
+const sonstigeFreieTageTexts = ['Todesfall', 'Betriebsausflug', 'Reisezeit', 'Arbeitszeit_(Re', 'Außendienst'];
+
+const DEBUG_OUTPUT = false;
 
 function calc() {
+    if (!DEBUG_OUTPUT) console.debug = function(){};
+
+    console.debug('################### START ####################');
+
     clearErrors();
     saveValuesInCookie();
+
 
     let sapText = $('#sap-text').val();
 
@@ -11,10 +19,15 @@ function calc() {
     sapText = sapText.replaceAll('Fortbildung ext', 'Fortbildung_ext')
         .replaceAll('ganztägiger Zei', 'ganztägiger_Zei')
         .replaceAll('Erfaßte Zeiten', 'Erfaßte_Zeiten')
-        .replaceAll('Krankheit Covid', 'Krankheit');
+        .replaceAll('Krankheit Covid', 'Krankheit')
+        .replaceAll('Todesfall Sonst', 'Todesfall')
+        .replaceAll('Arbeitszeit (Re', 'Arbeitszeit_(Re');
 
-    for (let feiertagText of feiertagTexts) {
+        for (let feiertagText of feiertagTexts) {
         sapText = sapText.replaceAll(feiertagText, 'Feiertag');
+    }
+    for (let sonstigeFreieTageText of sonstigeFreieTageTexts) {
+        sapText = sapText.replaceAll(sonstigeFreieTageText, 'Sonstiges');
     }
 
     let sapLines = sapText.split("\n");
@@ -24,6 +37,7 @@ function calc() {
     let zaGanzTage = calcZAGanztaegig(sapLines);
     let schulungHours = calcSchulungHours(sapLines);
     let feierTage = calcFeiertage(sapLines);
+    let sonstigeFreieTage = calcSonstigeFreieTage(sapLines);
 
 
     sapLines = removeNonsense(sapLines);
@@ -36,7 +50,7 @@ function calc() {
 
     let sollHoursPerWeek = $('#hoursPerWeek').val();
     let sollHoursPerMonth = round(166.666666 / 38.5 * sollHoursPerWeek );
-    // console.log('# Soll Arbeitszeit / Monat: ' + sollHoursPerMonth + 'h');
+    console.debug('# Soll Arbeitszeit / Monat: ' + sollHoursPerMonth + 'h');
 
     let workingHoursPerDay = sollHoursPerWeek / 5;
     // 7,7h / Tag bei 38,5h
@@ -57,28 +71,22 @@ function calc() {
         ((krankheitsTage + futureFreeDays +
             urlaubsTage + planedHolidays +
             zaGanzTage +
-            feierTage) * anwesenheitPerDay
+            feierTage + sonstigeFreieTage) * anwesenheitPerDay
             + (planedSchulung * workingHoursPerDay)
             + schulungHours
         );
 
     let sollAnwesenheitSAP = sollAnwesenheitPerMonth - sollAnwesenheitThisMonth - timeAnwesend;
-
     sollAnwesenheitThisMonth = round(sollAnwesenheitThisMonth);
 
-    // console.log('# Soll Anwesenheit (korrigiert): ' + sollAnwesenheitThisMonth + 'h');
-    // outputDebug(sapLines);
-    // console.debug('# Arbeitstage: ' + workingDays);
-    // console.debug('# Urlaubstage bisher: ' + urlaubsTage);
-    // console.debug('# Urlaubstage geplant: ' + planedHolidays);
-    // console.debug('# Arbeitstage relevant: ' + finalWorkingDays + 'd');
-    // console.debug('# Arbeitszeit relevant: ' + (finalWorkingDays * sollHoursPerDay) + 'h');
-    // console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
-    // console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
-    // console.debug('# Anwesend SOLL: ' + round(sollAnwesenheitThisMonth) + 'h');
+    console.debug('# Soll Anwesenheit: ' + sollAnwesenheitThisMonth + 'h');
+    console.debug('# Urlaubstage bisher: ' + urlaubsTage);
+    console.debug('# Urlaubstage geplant: ' + planedHolidays);
+    console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
+    console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
+    console.debug('# Anwesend SOLL: ' + round(sollAnwesenheitThisMonth) + 'h');
     let anwesendDIFF = sollAnwesenheitThisMonth - timeAnwesend;
-    // console.debug('# Restzeit: ' + round(anwesendDIFF )  + 'h');
-
+    console.debug('# Restzeit: ' + round(anwesendDIFF )  + 'h');
 
 
     let heuteAnwesend = $('#heuteAnwesend').is(':checked');
@@ -88,12 +96,13 @@ function calc() {
     let timeEnd = new Date().getHours() + new Date().getMinutes() / 60;
     let timeAnwesendHeute = 0;
     if (heuteAnwesend) {
-        timeAnwesendHeute =timeEnd - timeStart;
+        timeAnwesendHeute = round(timeEnd - timeStart);
+        console.debug('# Anwesend heute: ' + timeAnwesendHeute + 'h');
         if (timeAnwesendHeute > 6 && timeAnwesendHeute < 6.5) timeAnwesendHeute = 6;
-        if (timeAnwesendHeute > 6.5) timeAnwesendHeute -= 0.5;
+        if (timeAnwesendHeute > 6.5) timeAnwesendHeutes -= 0.5;
+        console.debug('# Anwesend heute (korrigiert): ' + timeAnwesendHeute + 'h');
     }
     let anwesendDIFF2 = anwesendDIFF - timeAnwesendHeute;
-
 
 
 
@@ -131,6 +140,14 @@ function calc() {
         $('#feiertageGeplantStunden').text(formatHour(futureFreeDays * anwesenheitPerDay));
     } else {
         $('.row.feiertageGeplant').hide();
+    }
+
+    if (sonstigeFreieTage > 0) {
+        $('.row.sonstiges').show();
+        $('#sonstigesTage').text(sonstigeFreieTage);
+        $('#sonstigesStunden').text(formatHour(sonstigeFreieTage * anwesenheitPerDay));
+    } else {
+        $('.row.sonstiges').hide();
     }
 
 
@@ -257,6 +274,10 @@ function calcFeiertage(sapLines) {
     return calcSpecialDays(sapLines, 'Feiertag');
 }
 
+function calcSonstigeFreieTage(sapLines) {
+    return calcSpecialDays(sapLines, 'Sonstiges');
+}
+
 /**
  * Generische Methode
  * Zählt die Anzahl der Tage, an denen in Spalte 3 gesuchte prefix vorkommt
@@ -270,7 +291,6 @@ function calcSpecialDays(sapLines, prefix) {
     for (const line of sapLines) {
         const sapCols = line.split(" ");
         if (sapCols[2] == prefix) {
-            // console.debug(prefix + " found: " + line);
             result++;
         }
     }
@@ -288,9 +308,16 @@ function calcSpecialHours(sapLines, prefix) {
     for (const line of sapLines) {
         const sapCols = line.split(" ");
         if (sapCols[2] == prefix) {
-            console.error(prefix + " found: " + line, sapCols);
-            console.error(parseFloat(sapCols[7].replaceAll(',', '.')));
-            result += parseFloat(sapCols[7].replaceAll(',', '.'));
+            // console.error(prefix + " found: " + line, sapCols);
+            // console.error(parseFloat(sapCols[7].replaceAll(',', '.')));
+            // example: "19 Mo Fortbildung_ext 6,00 6,00"
+            if (sapCols.length == 5) {
+                result += parseFloat(sapCols[4].replaceAll(',', '.'));
+            } else {
+                // Default:
+                result += parseFloat(sapCols[7].replaceAll(',', '.'));
+            }
+
         }
     }
     return result;
@@ -374,8 +401,8 @@ function removeSpecialDays(sapLines) {
     for (let line of sapLines) {
         line = line.trim();
         const sapCols = line.split(' ');
-        if (['Gebührenurlaub', 'Krankheit', 'Arztbesuch', 'Fortbildung_ext', 'ganztägiger_Zei', 'Erfaßte_Zeiten'].includes(sapCols[2])) {
-            console.debug("Spezialtag found: " + line);
+        if (['Gebührenurlaub', 'Krankheit', 'Arztbesuch', 'Fortbildung_ext', 'ganztägiger_Zei', 'Erfaßte_Zeiten', 'Sonstiges'].includes(sapCols[2])) {
+            // console.debug("Spezialtag found: " + line);
             continue;
         }
         if (sapCols[2] == 'Teleworking' || sapCols[0] == 'Teleworking' ) {
@@ -421,32 +448,77 @@ function convertToBookings(sapLines) {
     let bookings = [];
     let lastCompleteDay = 0;
     let lastWeekDay = '';
-    let previousLineWasIncompleteLine = false;
+    let firstLineOfMultiLine = false;
+    let lastLineOfMultiLine = false;
     let lastIncompleteTime = 0;
 
+    // console.table(sapLines);
+
     for (let idx = 0; idx < sapLines.length; ++idx) {
-        const line = sapLines[idx];
+        firstLineOfMultiLine = false;
+        lastLineOfMultiLine = false;
+
+        let line = sapLines[idx];
         if (line.trim() == '') continue;
-        const sapCols = line.split(' ');
+        let sapCols = line.split(' ');
+        // console.table(sapCols);
+        // console.log(line)
+        // console.error("length: ", sapCols.length)
+
+        if (sapCols.length == 9) {
+            // Checking incomplete line (without "04" on 3rd place) - by Zeitbuchungskorrektur
+            // zB: "11 Di 11 08:49 17:15 8,43 7,70 7,93 0,23"        which should be
+            //     "11 Di 04 11 08:49 17:15 8,43 7,70 7,93 0,23"
+            // console.log("Ungewöhnliche Zeile: " + line)
+            if (sapCols[0].length == 2 && sapCols[1].length == 2 && sapCols[2].length == 2
+                && sapCols[4].length !== 2) {
+                sapCols = [ ...sapCols.slice(0, 2), '04', ...sapCols.slice(2)];
+                line = sapCols.join(' ');
+            }
+            // console.log("After change: " + line)
+        }
+
 
         // Plausi-Check:
         if (sapCols[2].length != 2 || sapCols[3].length != 2) {
             if (sapCols.length == 4) { // Ungebuchte Tage
                 continue;
+            } else if (sapCols.length == 8 ) { // Folg-Zeilen einer mehrzeiligen Buchung?
+                lastLineOfMultiLine = true;
+                // console.error("lastLineOfMultiLine: " +  line)
+                // console.table(sapCols);
             } else {
                 console.error("Ignoring unknown line: " + line);
+                // console.table(sapCols);
                 showError("Ignoring unknown line: " + line + ' <a href="mailto:rene.huber@brz.gv.at?subject='
                 + encodeURI('Zenacu-Feedback: Unknown Line in SAP found') + '&body=' + encodeURI(line) + '">Inform Developer</a>');
                 continue;
             }
         }
+        if (sapCols.length == 7) { // 1. Zeile einer mehrzeiligen Buchung?
+            firstLineOfMultiLine = true;
+            // console.log("firstLineOfMultiLine: " +  line)
+            // console.table(sapCols);
+            // console.error("XXXXXX")
+            continue;
+        }
+        if (sapCols.length == 10 ) { // Folg-Zeilen einer mehrzeiligen Buchung?
+            lastLineOfMultiLine = true;
+            // console.error("lastLineOfMultiLine: " + line)
+            // console.table(sapCols);
+        }
 
         // Normales Booking von 1-Zeiler:
         let day = parseInt(sapCols[0]);
         let weekDay = sapCols[1];
-        let time = parseNumber(sapCols[6]);
-        if (time > 6 && time < 6.5) time = 6;
-        if (time > 6.5) time -= 0.5;
+        let time = sapCols.length == 10 ? parseNumber(sapCols[8]) : parseNumber(sapCols[6]);
+        // console.log("time: ", time);
+
+
+        if (!lastLineOfMultiLine) {
+            if (time > 6 && time < 6.5) time = 6;
+            if (time > 6.5) time -= 0.5;
+        }
 
         // console.log("Full line found: " + line);
         let booking = bookings[day] ;
@@ -457,13 +529,8 @@ function convertToBookings(sapLines) {
              booking = new Booking(day, weekDay, time);
         }
         bookings[day] = booking;
-        previousLineWasIncompleteLine = false;
-
-
-
-        // }
     }
-    // console.log(bookings);
+    // console.table(bookings);
     return bookings;
 }
 
@@ -490,15 +557,6 @@ function clearErrors() {
 function showError(text) {
     $('.errors').removeClass('hidden');
     $('.errors .alert').html( $('.errors .alert').html() + '<p>' + text + '</p>');
-}
-
-function outputDebug(sapLines) {
-    let oDebug = $('#debug');
-    let result = "";
-    for (const line of sapLines) {
-        result += line + "\n";
-    }
-    oDebug.val(result);
 }
 
 function parseNumber(val) {
