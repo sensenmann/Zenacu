@@ -1,7 +1,7 @@
 const feiertagTexts = ['Maria Hf.', 'Chr.Himm.', 'Nationalft', 'Allerheil.', 'Neujahr', 'Maria Empf', 'Hl.Abend', 'Christtag', 'Stefanitag', 'Staatsft.', 'Pfingstmo.', 'Fronleichn'];
 const sonstigeFreieTageTexts = ['Todesfall', 'Betriebsausflug', 'Reisezeit', 'Arbeitszeit_(Re', 'Außendienst'];
 
-const DEBUG_OUTPUT = false;
+const DEBUG_OUTPUT = true;
 
 function calc() {
     if (!DEBUG_OUTPUT) console.debug = function(){};
@@ -32,12 +32,12 @@ function calc() {
 
     let sapLines = sapText.split("\n");
 
-    let urlaubsTage = calcUrlaubsTage(sapLines);
-    let krankheitsTage = calcKrankheit(sapLines);
-    let zaGanzTage = calcZAGanztaegig(sapLines);
-    let schulungHours = calcSchulungHours(sapLines);
-    let feierTage = calcFeiertage(sapLines);
-    let sonstigeFreieTage = calcSonstigeFreieTage(sapLines);
+    let urlaubsTageBisher = calcUrlaubsTage(sapLines);
+    let krankheitsTageBisher = calcKrankheit(sapLines);
+    let zaGanzTageBisher = calcZAGanztaegig(sapLines);
+    let schulungHoursBisher = calcSchulungHours(sapLines);
+    let feierTageBisher = calcFeiertage(sapLines);
+    let sonstigeFreieTageBisher = calcSonstigeFreieTage(sapLines);
 
 
     sapLines = removeNonsense(sapLines);
@@ -66,21 +66,25 @@ function calc() {
     let planedHolidays = parseInt($('#planedHolidays').val());
     let planedSchulung = parseInt($('#planedSchulung').val());
 
-    // let finalWorkingDays = workingDays - futureFreeDays- planedHolidays - urlaubsTage;
+    // let finalWorkingDays = workingDays - futureFreeDays- planedHolidays - urlaubsTageBisher;
+    // ECHTE noch zu erbringende Anwesenheit:
     let sollAnwesenheitThisMonth = sollAnwesenheitPerMonth -
-        ((krankheitsTage + futureFreeDays +
-            urlaubsTage + planedHolidays +
-            zaGanzTage +
-            feierTage + sonstigeFreieTage) * anwesenheitPerDay
+        ((krankheitsTageBisher + futureFreeDays +
+            urlaubsTageBisher + planedHolidays +
+            zaGanzTageBisher +
+            feierTageBisher + sonstigeFreieTageBisher) * anwesenheitPerDay
             + (planedSchulung * workingHoursPerDay)
-            + schulungHours
+            + schulungHoursBisher
         );
 
-    let sollAnwesenheitSAP = sollAnwesenheitPerMonth - sollAnwesenheitThisMonth - timeAnwesend;
+    let sollAnwesenheitSAP = sollAnwesenheitPerMonth -
+        ((krankheitsTageBisher + urlaubsTageBisher + zaGanzTageBisher + feierTageBisher + sonstigeFreieTageBisher) * anwesenheitPerDay + schulungHoursBisher)
+        - timeAnwesend;
     sollAnwesenheitThisMonth = round(sollAnwesenheitThisMonth);
 
     console.debug('# Soll Anwesenheit: ' + sollAnwesenheitThisMonth + 'h');
-    console.debug('# Urlaubstage bisher: ' + urlaubsTage);
+    console.debug('# Soll Anwesenheit/Monat: ' + sollAnwesenheitPerMonth + 'h');
+    console.debug('# Urlaubstage bisher: ' + urlaubsTageBisher);
     console.debug('# Urlaubstage geplant: ' + planedHolidays);
     console.debug('# Anwesend IST:  ' + round(timeAnwesend) + 'h');
     console.debug('# Anwesend SOLL (lt. SAP): ' + onlyPositive(round(sollAnwesenheitSAP) + 'h'));
@@ -110,10 +114,10 @@ function calc() {
     $('#sollAnwesenheit').text(formatHour(sollAnwesenheitPerMonth));
     $('#sollAnwesenheitSAP').text(formatHour(sollAnwesenheitSAP, true));
 
-    if (urlaubsTage > 0) {
+    if (urlaubsTageBisher > 0) {
         $('.row.urlaubeBisher').show();
-        $('#urlaubeBisherTage').text(urlaubsTage);
-        $('#urlaubeBisherStunden').text(formatHour(urlaubsTage * anwesenheitPerDay));
+        $('#urlaubeBisherTage').text(urlaubsTageBisher);
+        $('#urlaubeBisherStunden').text(formatHour(urlaubsTageBisher * anwesenheitPerDay));
     } else {
         $('.row.urlaubeBisher').hide();
     }
@@ -126,10 +130,10 @@ function calc() {
         $('.row.urlaubeGeplant').hide();
     }
 
-    if (feierTage > 0) {
+    if (feierTageBisher > 0) {
         $('.row.feiertageBisher').show();
-        $('#feiertageBisherTage').text(feierTage);
-        $('#feiertageBisherStunden').text(formatHour(feierTage * anwesenheitPerDay));
+        $('#feiertageBisherTage').text(feierTageBisher);
+        $('#feiertageBisherStunden').text(formatHour(feierTageBisher * anwesenheitPerDay));
     } else {
         $('.row.feiertageBisher').hide();
     }
@@ -142,26 +146,26 @@ function calc() {
         $('.row.feiertageGeplant').hide();
     }
 
-    if (sonstigeFreieTage > 0) {
+    if (sonstigeFreieTageBisher > 0) {
         $('.row.sonstiges').show();
-        $('#sonstigesTage').text(sonstigeFreieTage);
-        $('#sonstigesStunden').text(formatHour(sonstigeFreieTage * anwesenheitPerDay));
+        $('#sonstigesTage').text(sonstigeFreieTageBisher);
+        $('#sonstigesStunden').text(formatHour(sonstigeFreieTageBisher * anwesenheitPerDay));
     } else {
         $('.row.sonstiges').hide();
     }
 
 
-    if (krankheitsTage > 0) {
+    if (krankheitsTageBisher > 0) {
         $('.row.krankheit').show();
-        $('#krankheitBisherTage').text(krankheitsTage);
-        $('#krankheitBisherStunden').text(formatHour(krankheitsTage * anwesenheitPerDay));
+        $('#krankheitBisherTage').text(krankheitsTageBisher);
+        $('#krankheitBisherStunden').text(formatHour(krankheitsTageBisher * anwesenheitPerDay));
     } else {
         $('.row.krankheit').hide();
     }
-    if (schulungHours > 0) {
+    if (schulungHoursBisher > 0) {
         $('.row.schulungBisher').show();
-        $('#schulungBisherTage').text(schulungHours / workingHoursPerDay);
-        $('#schulungBisherStunden').text(formatHour(schulungHours));
+        $('#schulungBisherTage').text(schulungHoursBisher / workingHoursPerDay);
+        $('#schulungBisherStunden').text(formatHour(schulungHoursBisher));
     } else {
         $('.row.schulungBisher').hide();
     }
@@ -173,10 +177,10 @@ function calc() {
         $('.row.schulungGeplant').hide();
     }
 
-    if (zaGanzTage > 0) {
+    if (zaGanzTageBisher > 0) {
         $('.row.zeitausgleich').show();
-        $('#zaBisherTage').text(zaGanzTage);
-        $('#zaBisherStunden').text(formatHour(zaGanzTage * anwesenheitPerDay));
+        $('#zaBisherTage').text(zaGanzTageBisher);
+        $('#zaBisherStunden').text(formatHour(zaGanzTageBisher * anwesenheitPerDay));
     } else {
         $('.row.zeitausgleich').hide();
     }
