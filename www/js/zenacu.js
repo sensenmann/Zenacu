@@ -103,7 +103,7 @@ function calc() {
         timeAnwesendHeute = round(timeEnd - timeStart);
         console.debug('# Anwesend heute: ' + timeAnwesendHeute + 'h');
         if (timeAnwesendHeute > 6 && timeAnwesendHeute < 6.5) timeAnwesendHeute = 6;
-        if (timeAnwesendHeute > 6.5) timeAnwesendHeutes -= 0.5;
+        if (timeAnwesendHeute > 6.5) timeAnwesendHeute -= 0.5;
         console.debug('# Anwesend heute (korrigiert): ' + timeAnwesendHeute + 'h');
     }
     let anwesendDIFF2 = anwesendDIFF - timeAnwesendHeute;
@@ -294,7 +294,7 @@ function calcSpecialDays(sapLines, prefix) {
     let result = 0;
     for (const line of sapLines) {
         const sapCols = line.split(" ");
-        if (sapCols[2] == prefix) {
+        if (sapCols[2] == prefix && ['Sa', 'So'].indexOf(sapCols[1]) === -1 ) {
             result++;
         }
     }
