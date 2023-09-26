@@ -46,6 +46,9 @@ function calc() {
 
     let ungebuchteTage = calcUngebuchteTage(sapLines);
     let bookings = convertToBookings(sapLines);
+
+    // console.table(sapLines);
+
     let timeAnwesend = calcAnwesenheit(bookings);
 
     let sollHoursPerWeek = $('#hoursPerWeek').val();
@@ -409,7 +412,7 @@ function removeSpecialDays(sapLines) {
             // console.debug("Spezialtag found: " + line);
             continue;
         }
-        if (sapCols[2] == 'Teleworking' || sapCols[0] == 'Teleworking' ) {
+        if (sapCols[2] == 'Teleworking') {
             // console.debug("Teleworking found: " + line);
             continue;
         }
@@ -466,7 +469,7 @@ function convertToBookings(sapLines) {
         if (line.trim() == '') continue;
         let sapCols = line.split(' ');
         // console.table(sapCols);
-        // console.log(line)
+        // console.error(line)
         // console.error("length: ", sapCols.length)
 
         if (sapCols.length == 9) {
@@ -500,13 +503,25 @@ function convertToBookings(sapLines) {
             }
         }
         if (sapCols.length == 7) { // 1. Zeile einer mehrzeiligen Buchung?
-            firstLineOfMultiLine = true;
+
             // console.log("firstLineOfMultiLine: " +  line)
             // console.table(sapCols);
             // console.error("XXXXXX")
-            continue;
+
+            let lineNext = sapLines[idx+1];
+            let sapColsNext = lineNext.split(' ');
+            // Wenn die Folgezeile nicht mehr am selben Tag ist, dann war wahrscheinlich Teleworking - was entfernt wurde.
+            // In diesem Fall ist diese Zeile automatisch auch gleich die letzte Zeile:
+            if (sapColsNext[0] != sapCols[0]) {
+
+            } else {
+                firstLineOfMultiLine = true;
+                continue;
+            }
+
+
         }
-        if (sapCols.length == 10 ) { // Folg-Zeilen einer mehrzeiligen Buchung?
+        if (sapCols.length == 10 ) { // Folge-Zeilen einer mehrzeiligen Buchung?
             lastLineOfMultiLine = true;
             // console.error("lastLineOfMultiLine: " + line)
             // console.table(sapCols);
