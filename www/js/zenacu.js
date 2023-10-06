@@ -497,7 +497,7 @@ function convertToBookings(sapLines) {
             } else {
                 console.error("Ignoring unknown line: " + line);
                 // console.table(sapCols);
-                showError("Ignoring unknown line: " + line + ' <a href="mailto:rene.huber@brz.gv.at?subject='
+                showError("Ignoring unknown line: " + line + ' <a href="mailto:rene.huber@rhse.at?subject='
                 + encodeURI('Zenacu-Feedback: Unknown Line in SAP found') + '&body=' + encodeURI(line) + '">Inform Developer</a>');
                 continue;
             }
