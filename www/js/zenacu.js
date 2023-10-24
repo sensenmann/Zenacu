@@ -1,10 +1,13 @@
 const feiertagTexts = ['Maria Hf.', 'Chr.Himm.', 'Nationalft', 'Allerheil.', 'Neujahr', 'Maria Empf', 'Hl.Abend', 'Christtag', 'Stefanitag', 'Staatsft.', 'Pfingstmo.', 'Fronleichn'];
 const sonstigeFreieTageTexts = ['Todesfall', 'Betriebsausflug', 'Reisezeit', 'Arbeitszeit_(Re', 'Außendienst'];
 
-const DEBUG_OUTPUT = true;
+const DEBUG_OUTPUT = false;
 
 function calc() {
-    if (!DEBUG_OUTPUT) console.debug = function(){};
+    if (!DEBUG_OUTPUT) {
+        console.debug = function(){};
+        console.table = function(){};
+    }
 
     console.debug('################### START ####################');
 
@@ -47,7 +50,8 @@ function calc() {
     let ungebuchteTage = calcUngebuchteTage(sapLines);
     let bookings = convertToBookings(sapLines);
 
-    // console.table(sapLines);
+
+    // console.table(sapLines); // Anwesend
 
     let timeAnwesend = calcAnwesenheit(bookings);
 
@@ -490,12 +494,14 @@ function convertToBookings(sapLines) {
         if (sapCols[2].length != 2 || sapCols[3].length != 2) {
             if (sapCols.length == 4) { // Ungebuchte Tage
                 continue;
-            } else if (sapCols.length == 8 ) { // Folg-Zeilen einer mehrzeiligen Buchung?
+            } else if (sapCols.length == 8 ) { // Folge-Zeilen einer mehrzeiligen Buchung?
                 lastLineOfMultiLine = true;
                 // console.error("lastLineOfMultiLine: " +  line)
                 // console.table(sapCols);
+            } else if (sapCols.length == 9 ) {
+                // Überstunden
             } else {
-                console.error("Ignoring unknown line: " + line);
+                console.error("Ignoring unknown line: " + line, "cols: " + sapCols.length);
                 // console.table(sapCols);
                 showError("Ignoring unknown line: " + line + ' <a href="mailto:rene.huber@rhse.at?subject='
                 + encodeURI('Zenacu-Feedback: Unknown Line in SAP found') + '&body=' + encodeURI(line) + '">Inform Developer</a>');
@@ -531,13 +537,19 @@ function convertToBookings(sapLines) {
         let day = parseInt(sapCols[0]);
         let weekDay = sapCols[1];
         let time = sapCols.length == 10 ? parseNumber(sapCols[8]) : parseNumber(sapCols[6]);
+
         // console.log("time: ", time);
 
-
-        if (!lastLineOfMultiLine) {
+        if (!lastLineOfMultiLine && time != 10) {
             if (time > 6 && time < 6.5) time = 6;
             if (time > 6.5) time -= 0.5;
         }
+
+        if (sapCols.length == 9) {
+            console.debug('day:', day, '- adding überstunden', sapCols[8], 'to', time);
+            time += parseNumber(sapCols[8]);   // Überstunden 50% addieren
+        }
+
 
         // console.log("Full line found: " + line);
         let booking = bookings[day] ;
@@ -545,18 +557,19 @@ function convertToBookings(sapLines) {
             booking = bookings[day];
             booking.time += time;
         } else {
-             booking = new Booking(day, weekDay, time);
+             booking = new Booking(day, weekDay, time, sapCols.length);
         }
         bookings[day] = booking;
     }
-    // console.table(bookings);
+    console.table(bookings);
     return bookings;
 }
 
-function Booking(day, weekDay, time) {
+function Booking(day, weekDay, time, sapCols) {
     this.day = day;
     this.weekDay = weekDay;
     this.time = time;
+    this.sapCols = sapCols;     // <- Debug
 }
 
 function calcAnwesenheit(bookings) {
